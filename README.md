@@ -11,7 +11,7 @@ Better math library. Wraps many of the C99 library math functions. Erlang lacks 
 | '-inf' | negative infinity |
 
 
-The driving factor for developing this NIF is my need for floating point remainder, nan and infinites. 
+The driving factor for developing this NIF is my need for floating point remainder, nan and infinities. 
 
 Build
 -----
