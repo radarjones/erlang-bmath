@@ -427,13 +427,13 @@ copysign(_X, _Y) ->
 fpclassify(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
-isfinite(X) when is_float(X) -> true;
+isfinite(X) when is_float(X); is_integer(X) -> true;
 isfinite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
 
-isinf(X) when is_float(X) -> false;
+isinf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
 isinf(X) when X =:= inf; X =:= '-inf' -> true.
 
-isnan(X) when is_float(X) -> false;
+isnan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
 isnan(X) when X =:= nan; X =:= '-nan' -> true.
 
 -spec isnormal(_X) -> boolean() when
