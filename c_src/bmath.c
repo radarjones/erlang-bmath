@@ -81,9 +81,16 @@ static ERL_NIF_TERM fpclassify_to_atom(ErlNifEnv *env, int arg)
 static bool get_double(ErlNifEnv *env, ERL_NIF_TERM term, double *x)
 {
     unsigned int sz;
+    ErlNifSInt64 i;
 
     if(enif_get_double(env, term, x))
         return true;
+
+    if(enif_get_int64(env, term, &i))
+    {
+        *x = i;
+        return true;
+    }
 
     if(enif_get_atom_length(env, term, &sz, ERL_NIF_LATIN1))
     {
