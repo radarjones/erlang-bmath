@@ -3,7 +3,7 @@ erlang-bmath
 
 Better math library. Wraps many of the C99 library math functions. 
 
-Erlang native floating pointer numbers do not support nan or infinity. If a math function returns either they are represented as the following atoms.
+Erlang native floating pointer numbers do not support nan or infinity. In bmath when a C math function returns either they are represented as the following atoms.
 
 | Atom   | Description       |
 | ------ | ----------------- |
