@@ -427,12 +427,15 @@ copysign(_X, _Y) ->
 fpclassify(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
+%% @doc Checks if the given value is finite
 isfinite(X) when is_float(X); is_integer(X) -> true;
 isfinite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
 
+%% @doc Checks if the given value is infinite
 isinf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
 isinf(X) when X =:= inf; X =:= '-inf' -> true.
 
+%% @doc Checks if the given value is NaN 
 isnan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
 isnan(X) when X =:= nan; X =:= '-nan' -> true.
 
