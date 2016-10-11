@@ -219,12 +219,12 @@ static ERL_NIF_TERM nif_fabs(ErlNifEnv *env, int argc,
 static ERL_NIF_TERM nif_fmod(ErlNifEnv *env, int argc,
                              const ERL_NIF_TERM argv[])
 {
-    double x = NAN, y = NAN;
+    double x, y;
 
     if(!get_double(env, argv[0], &x))
         return enif_make_badarg(env);
 
-    if(!get_double(env, argv[1], &x))
+    if(!get_double(env, argv[1], &y))
         return enif_make_badarg(env);
 
     return make_math_result(env, fmod(x, y));
