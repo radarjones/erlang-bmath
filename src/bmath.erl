@@ -181,10 +181,10 @@ fmin(_X, _Y) ->
 fdim(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
-%% @doc Computes Val bounded by Min and Max
+%% @doc Returns Value bounded by Min and Max
 
-bound(Min, Val, Max) ->
-    fmax(Min, fmin(Max, Val)).
+bound(Value, Min, Max) ->
+    fmax(Min, fmin(Max, Value)).
 
 -spec exp(_X) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity().
