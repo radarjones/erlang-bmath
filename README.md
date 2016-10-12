@@ -22,3 +22,7 @@ Documentation
 ----
     $ rebar3 edoc
 
+Unit Tests
+----
+    $ rebar3 eunit
+
