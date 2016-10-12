@@ -66,7 +66,7 @@
 %% classification and comparison
 -export([fpclassify/1, isfinite/1, isinf/1, isnan/1, isnormal/1,
          isgreater/2, isgreaterequal/2, isless/2, islessequal/2,
-         islessgreater/2, isunordered/2, fuzzy_compare/2, fuzzy_is_zero/1]).
+         islessgreater/2, isunordered/2, fuzzy_compare/2, fuzzy_zero/1]).
 %% conversions
 -export([degrees_to_radians/1, radians_to_degrees/1]).
 
@@ -487,10 +487,12 @@ islessgreater(_X, _Y) ->
 isunordered(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
+%% @doc Compares two floats in a relative way to see if they are equal. 
 fuzzy_compare(X, Y) ->
     islessequal(fmul(fabs(fsub(X,Y)),1000000000000.0),fmin(fabs(X),fabs(Y))).
 
-fuzzy_is_zero(X) ->
+%% @doc Checks if a number is condisered zero. 
+fuzzy_zero(X) ->
     islessequal(fabs(X), 0.000000000001).
 
 degrees_to_radians(Degrees) -> 

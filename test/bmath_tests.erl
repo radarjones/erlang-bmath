@@ -51,7 +51,7 @@ fmod_test() ->
     ?assert(bmath:fmod(-5.5, 5) == -0.5),
     ?assert(bmath:fmod(0, 1) == 0.0),
     ?assert(bmath:fmod(5.1, inf) == 5.1),
-    ?assert(bmath:fmod(5.1, 0) == nan).
+    ?assert(bmath:fmod(5.1, 0) == '-nan').
 
 remainder_test() ->
     ?assert(bmath:remainder(5.5, 5) == 0.5),
