@@ -3,7 +3,6 @@
 -include_lib("eunit/include/eunit.hrl").
 
 fadd_test() ->
-    ?assert(bmath:fadd(1.0, 2.0) == 3.0),
     ?assert(bmath:fadd(1, 2) == 3.0),
     ?assert(bmath:fadd(1.5, 2) == 3.5),
     ?assert(bmath:fadd(1, -1) == 0.0),
@@ -13,7 +12,6 @@ fadd_test() ->
     ?assert(bmath:fadd('-inf', 1) == '-inf').
 
 fsub_test() ->
-    ?assert(bmath:fsub(2.0, 1.0) == 1.0),
     ?assert(bmath:fsub(2, 1) == 1.0),
     ?assert(bmath:fsub(1.5, 2) == -0.5),
     ?assert(bmath:fsub(1, -1) == 2.0),
@@ -23,7 +21,6 @@ fsub_test() ->
     ?assert(bmath:fsub('-inf', 1) == '-inf').
 
 fmul_test() ->
-    ?assert(bmath:fmul(2.0, 3.0) == 6.0),
     ?assert(bmath:fmul(2, 3) == 6.0),
     ?assert(bmath:fmul(1.5, 2.5) == 3.75),
     ?assert(bmath:fmul(-2, 3) == -6.0),
@@ -35,7 +32,6 @@ fmul_test() ->
     ?assert(bmath:fmul(-1.0e200, 1.0e200) == '-inf').
 
 fdiv_test() ->
-    ?assert(bmath:fdiv(1.5, 2.0) == 0.75),
     ?assert(bmath:fdiv(1, 2) == 0.5),
     ?assert(bmath:fdiv(-1, 2) == -0.5),
     ?assert(bmath:fdiv(1.0, 0.0) == inf),
@@ -51,6 +47,14 @@ fabs_test() ->
     ?assert(bmath:fabs(1) == 1.0).
 
 fmod_test() ->
-    ?assert(bmath:fmod(5.5, 5) == 0.5).
+    ?assert(bmath:fmod(5.5, 5) == 0.5),
+    ?assert(bmath:fmod(-5.5, 5) == -0.5),
+    ?assert(bmath:fmod(0, 1) == 0.0),
+    ?assert(bmath:fmod(5.1, inf) == 5.1),
+    ?assert(bmath:fmod(5.1, 0) == nan).
 
+remainder_test() ->
+    ?assert(bmath:remainder(5.5, 5) == 0.5),
+    ?assert(bmath:remainder(-5.5, 5) == -0.5),
+    ?assert(bmath:remainder(0, 1) == 0.0).
 
