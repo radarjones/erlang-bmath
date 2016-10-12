@@ -697,6 +697,21 @@ static ERL_NIF_TERM nif_modf(ErlNifEnv *env, int argc,
                             make_math_result(env, fpart));
 }
 
+static ERL_NIF_TERM nif_nextafter(ErlNifEnv *env, int argc,
+                                  const ERL_NIF_TERM argv[])
+{
+    double from, to;
+
+    if(!get_double(env, argv[0], &from))
+        return enif_make_badarg(env);
+
+
+    if(!get_double(env, argv[1], &to))
+        return enif_make_badarg(env);
+
+    return make_math_result(env, nextafter(from, to));
+}
+
 static ERL_NIF_TERM nif_copysign(ErlNifEnv *env, int argc,
                                  const ERL_NIF_TERM argv[])
 {
@@ -894,6 +909,7 @@ static ErlNifFunc nif_funcs[] =
     {"round",           1, nif_round},
     // floating-point manipulation functions
     {"modf",            1, nif_modf},
+    {"nextafter",       2, nif_nextafter},
     {"copysign",        2, nif_copysign},
     // classification and comparison
     {"fpclassify",      1, nif_fpclassify},

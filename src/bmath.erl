@@ -63,6 +63,7 @@
 -export([ceil/1, floor/1, trunc/1, round/1]).
 %% floating-point manipulation functions
 -export([modf/1, copysign/2]).
+-export([modf/1, nextafter/2, copysign/2]).
 %% classification and comparison
 -export([fpclassify/1, isfinite/1, isinf/1, isnan/1, isnormal/1,
          isgreater/2, isgreaterequal/2, isless/2, islessequal/2,
@@ -414,6 +415,12 @@ modf(_X) ->
 -spec copysign(_X, _Y) -> float() | nan | inf when
       _X :: number() | nan | inf,
       _Y :: number() | nan | inf.
+-spec nextafter(_From, _To) -> float() | nan() | infinity() when
+      _From :: number() | nan() | infinity(),
+      _To :: number() | nan() | infinity().
+
+nextafter(_From, _To) ->
+    erlang:nif_error({nif_not_loaded, ?MODULE}).
 %% @doc produces a value with the magnitude of a given value and the sign of
 %% another given value 
 
