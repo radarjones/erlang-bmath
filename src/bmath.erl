@@ -1,4 +1,5 @@
-%%%============================================================================
+%%% vim: set ts=4 sts=4 sw=4 tw=79 et :
+%%%---------------------------------------------------------------------------
 %%% Copyright (c) 2016, Mark Jones <markalanj@gmail.com>.
 %%% All rights reserved.
 %%%
@@ -28,9 +29,9 @@
 %%% THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 %%% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 %%% OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-%%%============================================================================
+%%%---------------------------------------------------------------------------
 
-%%%============================================================================
+%%%----------------------------------------------------------------------------
 %%% @author Mark Jones <markalanj@gmail.com>
 %%% @copyright 2016 Mark Jones
 %%% @version 0.1.0
@@ -41,7 +42,7 @@
 %%% represent not a number and infinity respectively. 
 %%% 
 %%% @end
-%%% ===========================================================================
+%%%--------------------------------------------------------------------------- 
 
 -module(bmath).
 -author('Mark Jones <markalanj@gmail.com>').
@@ -78,7 +79,7 @@
 -type infinity() :: inf | '-inf'.
 
 %%====================================================================
-%% API functions
+%% API
 %%====================================================================
 
 on_load() ->
@@ -454,19 +455,18 @@ fpclassify(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
 %% @doc Checks if the given value is finite
-isfinite(X) when is_float(X); is_integer(X) -> true;
+isfinite(X) when is_float(X); is_integer(X)                       -> true;
 isfinite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
 
 %% @doc Checks if the given value is infinite
 isinf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
-isinf(X) when X =:= inf; X =:= '-inf' -> true.
+isinf(X) when X =:= inf; X =:= '-inf'                             -> true.
 
 %% @doc Checks if the given value is NaN 
 isnan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
-isnan(X) when X =:= nan; X =:= '-nan' -> true.
+isnan(X) when X =:= nan; X =:= '-nan'                             -> true.
 
--spec isnormal(_X) -> boolean() when
-      _X :: number() | nan() | infinity().
+-spec isnormal(_X) -> boolean() when _X :: number() | nan() | infinity().
 %% @doc Checks if the given number is normal.
 
 isnormal(_X) ->
