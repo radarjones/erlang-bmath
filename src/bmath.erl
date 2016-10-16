@@ -503,10 +503,10 @@ fuzzy_zero(X) ->
     islessequal(fabs(X), 0.000000000001).
 
 degrees_to_radians(Degrees) -> 
-    fmul(Degrees, math:pi()/180).
+    fmul(Degrees, ?BMATH_PI/180).
 
 radians_to_degrees(Radians) -> 
-    fmul(Radians, 180/math:pi()).
+    fmul(Radians, 180/?BMATH_PI).
 
 %%====================================================================
 %% Internal functions
