@@ -70,7 +70,7 @@
 %% conversions
 -export([degrees_to_radians/1, radians_to_degrees/1]).
 
--on_load(init/0).
+-on_load(on_load/0).
 
 -include("include/bmath.hrl").
 
@@ -81,9 +81,16 @@
 %% API functions
 %%====================================================================
 
-init() ->
-    Lib = filename:join([code:priv_dir(?MODULE), ?MODULE]),
-    erlang:load_nif(Lib, 0).
+on_load() ->
+    PrivDir = case code:priv_dir(?MODULE) of
+                  {error, _} ->
+                      AppPath = filename:dirname(filename:dirname(
+                                                   code:which(?MODULE))),
+                      filename:join(AppPath, "priv");
+                  Path ->
+                      Path
+              end,
+    erlang:load_nif(filename:join(PrivDir, atom_to_list(?MODULE)), 0).
 
 -spec fadd(_X, _Y) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity(),
