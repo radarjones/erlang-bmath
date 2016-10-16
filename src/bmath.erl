@@ -40,6 +40,11 @@
 %%% point operations. This library tries to improve that by providing NIFs
 %%% to the C99 math library. Operations can return atoms representing 
 %%% not a number and infinity. 
+%%%
+%%% In addition to the C99 math functions, the library provides some common
+%%% math constants and other functions such as unit conversions and vector
+%%% operations. Note vector functions are not currently optimized with native 
+%%% parallelisation.
 %%% 
 %%% @end
 %%%--------------------------------------------------------------------------- 
@@ -71,7 +76,9 @@
          is_gt/2, is_ge/2, is_lt/2, is_le/2, is_ltgt/2, is_unordered/2,
          fuzzy_compare/2, fuzzy_zero/1]).
 %% conversions
--export([degrees_to_radians/1, radians_to_degrees/1]).
+-export([degrees_to_radians/1, radians_to_degrees/1, nan_to_num/1]).
+%% vector operations
+-export([sum/1, mean/1]).
 
 -on_load(on_load/0).
 
@@ -454,23 +461,23 @@ copy_sign(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
 -spec classify(_X) -> inf | nan | normal | subnormal | zero | unknown when
-      _X :: binary().
+      _X :: number() | nan() | infinity().
 %% @doc Classifies the given floating-point value 
 
 classify(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
 %% @doc Checks if the given value is finite
-is_finite(X) when is_float(X); is_integer(X)                       -> true;
-is_finite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
+is_finite(X) when is_float(X); is_integer(X) -> true;
+is_finite(X) when ?BMATH_NOTFINITE(X)        -> false.
 
 %% @doc Checks if the given value is infinite
-is_inf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
-is_inf(X) when X =:= inf; X =:= '-inf'                             -> true.
+is_inf(X) when ?BMATH_ISINF(X)                             -> true;
+is_inf(X) when is_float(X); is_integer(X); ?BMATH_ISNAN(X) -> false.
 
 %% @doc Checks if the given value is NaN 
-is_nan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
-is_nan(X) when X =:= nan; X =:= '-nan'                             -> true.
+is_nan(X) when ?BMATH_ISNAN(X)                             -> true;
+is_nan(X) when is_float(X); is_integer(X); ?BMATH_ISINF(X) -> false.
 
 -spec is_normal(_X) -> boolean() when _X :: number() | nan() | infinity().
 %% @doc Checks if the given number is normal.
@@ -558,7 +565,37 @@ degrees_to_radians(Degrees) ->
 radians_to_degrees(Radians) -> 
     fmul(Radians, 180/?BMATH_PI).
 
+sum(X) ->
+    sum(X, 0).
+
+mean(X) ->
+    mean(X, {0,0}).
+
+nan_to_num(X) when is_number(X)        -> X;
+nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
+nan_to_num(X) when is_list(X)          ->
+    nan_to_num(X,[]).
+
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+sum([], Acc)                             ->
+    Acc;
+sum([X|T], Acc) when is_number(X)        ->
+    sum(T, X + Acc);
+sum([X|T], Acc) when ?BMATH_NOTFINITE(X) ->
+    sum(T, Acc).            % skip non finite values
+
+mean([], {Sum, Len})                             -> 
+    Sum / Len;
+mean([X|T], {Sum, Len}) when is_number(X)        ->
+    mean(T, {X + Sum, Len + 1});
+mean([X|T], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
+    mean(T, {Sum, Len}).    % skip non finite values
+
+nan_to_num([], Acc)    ->
+    lists:reverse(Acc);
+nan_to_num([X|T], Acc) ->
+    nan_to_num(T, [nan_to_num(X) | Acc]).  
 

@@ -43,3 +43,6 @@
 -define(BMATH_SQRT1_2, 0.70710678118654752440).	% 1/sqrt(2)
 -define(BMATH_GOLDEN_RATIO, 1.61803398875).
 
+-define(BMATH_ISNAN(X), X == nan orelse X == '-nan').
+-define(BMATH_ISINF(X), X == inf orelse X == '-inf').
+-define(BMATH_NOTFINITE(X), ?BMATH_ISNAN(X) orelse ?BMATH_ISINF(X)). 
