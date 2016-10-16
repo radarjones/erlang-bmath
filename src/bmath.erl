@@ -36,16 +36,18 @@
 %%% @copyright 2016 Mark Jones
 %%% @version 0.1.0
 %%% @doc 
-%%% Better math NIFs. Erlang has poor support for common floating 
+%%% Better math library. Erlang has poor support for common floating 
 %%% point operations. This library tries to improve that by providing NIFs
-%%% to the C math library. Operations can return the atoms nan and inf to 
-%%% represent not a number and infinity respectively. 
+%%% to the C99 math library. Operations can return atoms representing 
+%%% not a number and infinity. 
 %%% 
 %%% @end
 %%%--------------------------------------------------------------------------- 
 
 -module(bmath).
 -author('Mark Jones <markalanj@gmail.com>').
+
+-include("include/bmath.hrl").
 
 %% basic operations
 -export([fadd/2, fsub/2, fmul/2, fdiv/2, fabs/1, fmod/2, remainder/2, 
@@ -63,20 +65,20 @@
 %% nearest integer floating-point operations
 -export([ceil/1, floor/1, trunc/1, round/1]).
 %% floating-point manipulation functions
--export([modf/1, nextafter/2, copysign/2]).
+-export([modf/1, next_after/2, copy_sign/2]).
 %% classification and comparison
--export([fpclassify/1, isfinite/1, isinf/1, isnan/1, isnormal/1,
-         isgreater/2, isgreaterequal/2, isless/2, islessequal/2,
-         islessgreater/2, isunordered/2, fuzzy_compare/2, fuzzy_zero/1]).
+-export([classify/1, is_finite/1, is_inf/1, is_nan/1, is_normal/1,
+         is_gt/2, is_ge/2, is_lt/2, is_le/2, is_ltgt/2, is_unordered/2,
+         fuzzy_compare/2, fuzzy_zero/1]).
 %% conversions
 -export([degrees_to_radians/1, radians_to_degrees/1]).
 
 -on_load(on_load/0).
 
--include("include/bmath.hrl").
-
 -type nan() :: nan | '-nan'.
 -type infinity() :: inf | '-inf'.
+
+-export_type([nan/0, infinity/0]).
 
 %%====================================================================
 %% API
@@ -151,6 +153,8 @@ remainder(_X, _Y_) ->
 -spec remquo(_X, _Y) -> {float() | nan() | infinity(), integer()} when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
+%% @doc Computes signed remainder as well as the three last bits of the 
+%% division operation 
 
 remquo(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
@@ -431,79 +435,125 @@ round(_X) ->
 modf(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
--spec nextafter(_From, _To) -> float() | nan() | infinity() when
+-spec next_after(_From, _To) -> float() | nan() | infinity() when
       _From :: number() | nan() | infinity(),
       _To :: number() | nan() | infinity().
+%% @doc Determines next representable floating-point value towards the given 
+%% value 
 
-nextafter(_From, _To) ->
+next_after(_From, _To) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
--spec copysign(_X, _Y) -> float() | nan() | infinity() when
+-spec copy_sign(_X, _Y) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
-%% @doc produces a value with the magnitude of a given value and the sign of
+%% @doc Produces a value with the magnitude of a given value and the sign of
 %% another given value 
 
-copysign(_X, _Y) ->
+copy_sign(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
--spec fpclassify(_X) -> inf | nan | normal | subnormal | zero | unknown when
+-spec classify(_X) -> inf | nan | normal | subnormal | zero | unknown when
       _X :: binary().
 %% @doc Classifies the given floating-point value 
 
-fpclassify(_X) ->
+classify(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
 %% @doc Checks if the given value is finite
-isfinite(X) when is_float(X); is_integer(X)                       -> true;
-isfinite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
+is_finite(X) when is_float(X); is_integer(X)                       -> true;
+is_finite(X) when X =:= nan; X =:= '-nan'; X =:= inf; X =:= '-inf' -> false.
 
 %% @doc Checks if the given value is infinite
-isinf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
-isinf(X) when X =:= inf; X =:= '-inf'                             -> true.
+is_inf(X) when is_float(X); is_integer(X); X =:= nan; X =:= '-nan' -> false;
+is_inf(X) when X =:= inf; X =:= '-inf'                             -> true.
 
 %% @doc Checks if the given value is NaN 
-isnan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
-isnan(X) when X =:= nan; X =:= '-nan'                             -> true.
+is_nan(X) when is_float(X); is_integer(X); X =:= inf; X =:= '-inf' -> false;
+is_nan(X) when X =:= nan; X =:= '-nan'                             -> true.
 
--spec isnormal(_X) -> boolean() when _X :: number() | nan() | infinity().
+-spec is_normal(_X) -> boolean() when _X :: number() | nan() | infinity().
 %% @doc Checks if the given number is normal.
 
-isnormal(_X) ->
+is_normal(_X) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
-isgreater(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
-
-isgreaterequal(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
-
-isless(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
-
--spec islessequal(_X, _Y) -> float() | nan() | infinity() when
+-spec is_gt(_X, _Y) -> boolean() when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
+%% @doc Checks if the first floating-point argument is greater than the second 
 
-islessequal(_X, _Y) ->
+is_gt(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
-islessgreater(_X, _Y) ->
+-spec is_ge(_X, _Y) -> boolean() when
+      _X :: number() | nan() | infinity(),
+      _Y :: number() | nan() | infinity().
+%% @doc Checks if the first floating-point argument is greater or equal than
+%% the second 
+
+is_ge(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
-isunordered(_X, _Y) ->
+-spec is_lt(_X, _Y) -> boolean() when
+      _X :: number() | nan() | infinity(),
+      _Y :: number() | nan() | infinity().
+%% @doc Checks if the first floating-point argument is less than the second 
+
+is_lt(_X, _Y) ->
     erlang:nif_error({nif_not_loaded, ?MODULE}).
 
+-spec is_le(_X, _Y) -> boolean() when
+      _X :: number() | nan() | infinity(),
+      _Y :: number() | nan() | infinity().
+%% @doc Checks if the first floating-point argument is less or equal than 
+%% the second 
+
+is_le(_X, _Y) ->
+    erlang:nif_error({nif_not_loaded, ?MODULE}).
+
+-spec is_ltgt(_X, _Y) -> boolean() when
+      _X :: number() | nan() | infinity(),
+      _Y :: number() | nan() | infinity().
+%% @doc Checks if the first floating-point argument is less or greater than 
+%% the second 
+
+is_ltgt(_X, _Y) ->
+    erlang:nif_error({nif_not_loaded, ?MODULE}).
+
+-spec is_unordered(_X, _Y) -> boolean() when
+      _X :: number() | nan() | infinity(),
+      _Y :: number() | nan() | infinity().
+%% @doc Checks if two floating-point values are unordered
+
+is_unordered(_X, _Y) ->
+    erlang:nif_error({nif_not_loaded, ?MODULE}).
+
+-spec fuzzy_compare(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Compares two floats in a relative way to see if they are equal. 
-fuzzy_compare(X, Y) ->
-    islessequal(fmul(fabs(fsub(X,Y)),1000000000000.0),fmin(fabs(X),fabs(Y))).
 
+fuzzy_compare(X, Y) ->
+    is_le(fmul(fabs(fsub(X,Y)),1000000000000.0),fmin(fabs(X),fabs(Y))).
+
+-spec fuzzy_zero(X) -> boolean() when
+      X :: number() | nan() | infinity().
 %% @doc Checks if a number is condisered zero. 
+
 fuzzy_zero(X) ->
-    islessequal(fabs(X), 0.000000000001).
+    is_le(fabs(X), 0.000000000001).
+
+-spec degrees_to_radians(Degrees) -> float() when
+      Degrees :: float().
+%% @doc Converts degrees to radians
 
 degrees_to_radians(Degrees) -> 
     fmul(Degrees, ?BMATH_PI/180).
+
+-spec radians_to_degrees(Radians) -> float() when
+      Radians :: float().
+%% @doc Coverts radians to degrees
 
 radians_to_degrees(Radians) -> 
     fmul(Radians, 180/?BMATH_PI).

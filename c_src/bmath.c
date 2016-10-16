@@ -910,17 +910,17 @@ static ErlNifFunc nif_funcs[] = {
 	{"round",		1, nif_round},
 	// floating-point manipulation functions
 	{"modf",		1, nif_modf},
-	{"nextafter",		2, nif_nextafter},
-	{"copysign",		2, nif_copysign},
+	{"next_after",		2, nif_nextafter},
+	{"copy_sign",		2, nif_copysign},
 	// classification and comparison
-	{"fpclassify",		1, nif_fpclassify},
-	{"isnormal",		1, nif_isnormal},
-	{"isgreater",		2, nif_isgreater},
-	{"isgreaterequal",	2, nif_isgreaterequal},
-	{"isless",		2, nif_isless},
-	{"islessequal",		2, nif_islessequal},
-	{"islessgreater",	2, nif_islessgreater},
-	{"isunordered",		2, nif_isunordered}
+	{"classify",		1, nif_fpclassify},
+	{"is_normal",		1, nif_isnormal},
+	{"is_gt",		2, nif_isgreater},
+	{"is_ge",		2, nif_isgreaterequal},
+	{"is_lt",		2, nif_isless},
+	{"is_le",		2, nif_islessequal},
+	{"is_ltgt",		2, nif_islessgreater},
+	{"is_unordered",	2, nif_isunordered}
 };
 
 static int
