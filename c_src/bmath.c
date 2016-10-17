@@ -47,6 +47,10 @@ struct bmath_priv {
 	unsigned int vsn;
 	ERL_NIF_TERM atom_true;
 	ERL_NIF_TERM atom_false;
+	ERL_NIF_TERM atom_pos_nan;
+	ERL_NIF_TERM atom_neg_nan;
+	ERL_NIF_TERM atom_pos_inf;
+	ERL_NIF_TERM atom_neg_inf;
 };
 
 static int load_count;
@@ -65,29 +69,30 @@ make_atom(ErlNifEnv *env, const char *str)
 static ERL_NIF_TERM
 fpclassify_to_atom(ErlNifEnv *env, int arg)
 {
-	const char *str;
+	ERL_NIF_TERM ret;
+	struct bmath_priv *priv = enif_priv_data(env);
 
 	switch(arg) {
 	case FP_INFINITE:
-		str = ATOM_POS_INF;
+		ret = priv->atom_pos_inf;
 		break;
 	case FP_NAN:
-		str = ATOM_POS_NAN;
+		ret = priv->atom_pos_nan;
 		break;
 	case FP_NORMAL:
-		str = "normal";
+		ret = make_atom(env, "normal");
 		break;
 	case FP_SUBNORMAL:
-		str = "subnormal";
+		ret = make_atom(env, "subnormal");
 		break;
 	case FP_ZERO:
-		str = "zero";
+		ret = make_atom(env, "zero");
 		break;
 	default:
-		str = "unknown";
+		ret = make_atom(env, "unknown");
 		break;
 	}
-	return make_atom(env, str);
+	return ret;
 }
 
 static bool
@@ -95,6 +100,7 @@ get_double(ErlNifEnv *env, ERL_NIF_TERM term, double *x)
 {
 	unsigned int sz;
 	ErlNifSInt64 i;
+	struct bmath_priv *priv = enif_priv_data(env);
 
 	if(enif_get_double(env, term, x))
 		return true;
@@ -104,6 +110,16 @@ get_double(ErlNifEnv *env, ERL_NIF_TERM term, double *x)
 		return true;
 	}
 
+	/* Calling enif_compare at a minimum wreaks remquo results. Calling
+	 * enif_is_identical results in worse behavior. Comparing atoms as 
+	 * strings seems to be ok */
+
+#undef WREAK_REMQUO
+#ifdef WREAK_REMQUO
+	enif_compare(term, priv->atom_pos_nan);
+#endif
+
+#if 1
 	if(enif_get_atom_length(env, term, &sz, ERL_NIF_LATIN1)) {
 		char buf[sz + 1];
 		enif_get_atom(env, term, buf, sizeof(buf), ERL_NIF_LATIN1);
@@ -124,25 +140,53 @@ get_double(ErlNifEnv *env, ERL_NIF_TERM term, double *x)
 			return true;
 		}
 	}
+#else
+	if(enif_is_atom(env, term)) {
+		if(enif_compare(term, priv->atom_pos_nan) == 0) {
+			*x = NAN;
+			printf("nan\r\n");
+			return true;
+		}
+		if(enif_compare(term, priv->atom_neg_nan) == 0) {
+			*x = -NAN;
+			printf("-nan\r\n");
+			return true;
+		}
+		if(enif_compare(term, priv->atom_pos_inf) == 0) {
+			*x = INFINITY;
+			printf("inf\r\n");
+			return true;
+		}
+		if(enif_compare(term, priv->atom_neg_inf) == 0) {
+			*x = -INFINITY;
+			printf("-inf\r\n");
+			return true;
+		}
+	}
+#endif
 	return false;
 }
 
 static ERL_NIF_TERM
 nan_to_atom(ErlNifEnv *env, double x)
 {
+	struct bmath_priv *priv = enif_priv_data(env);
+
 	if(signbit(x))
-		return make_atom(env, ATOM_NEG_NAN);
+		return priv->atom_neg_nan;
 	else
-		return make_atom(env, ATOM_POS_NAN);
+		return priv->atom_pos_nan;
 }
 
 static ERL_NIF_TERM
 inf_to_atom(ErlNifEnv *env, double x)
 {
+	struct bmath_priv *priv = enif_priv_data(env);
+
 	if(signbit(x))
-		return make_atom(env, ATOM_NEG_INF);
+		return priv->atom_neg_inf;
 	else
-		return make_atom(env, ATOM_POS_INF);
+		return priv->atom_pos_inf;
 }
 
 static ERL_NIF_TERM
@@ -266,9 +310,12 @@ nif_remquo(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 		return enif_make_badarg(env);
 
 	rem = remquo(x, y, &quo);
+#if 0
+	printf("remquo(%f, %f) = {%f, %d}\r\n", x, y, rem, quo);
+#endif
 	return enif_make_tuple2(env,
 	                        make_math_result(env, rem),
-	                        enif_make_int(env, quo));
+	                        enif_make_int64(env, quo));
 }
 
 static ERL_NIF_TERM
@@ -946,6 +993,10 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
 	priv->vsn = 0;
 	priv->atom_true = make_atom(env, "true");
 	priv->atom_false = make_atom(env, "false");
+	priv->atom_pos_nan = make_atom(env, ATOM_POS_NAN);
+	priv->atom_neg_nan = make_atom(env, ATOM_NEG_NAN);
+	priv->atom_pos_inf = make_atom(env, ATOM_POS_INF);
+	priv->atom_neg_inf = make_atom(env, ATOM_NEG_INF);
 
 	load_count++;
 	return 0;
