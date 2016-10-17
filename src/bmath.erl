@@ -42,9 +42,9 @@
 %%% not a number and infinity. 
 %%%
 %%% In addition to the C99 math functions, the library provides some common
-%%% math constants and other functions such as unit conversions and vector
-%%% operations. Note vector functions are not currently optimized with native 
-%%% parallelisation.
+%%% math constants and other functions such as unit conversions and vector 
+%%% (list) operations. Note vector functions are not currently 
+%%% optimized with native code.
 %%% 
 %%% @end
 %%%--------------------------------------------------------------------------- 
@@ -78,7 +78,7 @@
 %% conversions
 -export([degrees_to_radians/1, radians_to_degrees/1, nan_to_num/1]).
 %% vector operations
--export([sum/1, mean/1]).
+-export([sum/1, mean/1, variance/1, stddev/1]).
 
 -on_load(on_load/0).
 
@@ -560,25 +560,46 @@ degrees_to_radians(Degrees) ->
 
 -spec radians_to_degrees(Radians) -> float() when
       Radians :: float().
-%% @doc Coverts radians to degrees
+%% @doc Converts radians to degrees
 
 radians_to_degrees(Radians) -> 
     fmul(Radians, 180/?BMATH_PI).
-
-sum(X) ->
-    sum(X, 0).
-
-mean(X) ->
-    mean(X, {0,0}).
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
 nan_to_num(X) when is_list(X)          ->
     nan_to_num(X,[]).
 
+sum(Numbers) ->
+    sum(Numbers, 0).
+
+mean(Numbers) ->
+    mean(Numbers, {0,0}).
+
+variance(Numbers) ->
+    Mean = mean(Numbers),
+    F = fun(X, {Len, Sum}) -> 
+                case is_finite(X) of
+                    true ->
+                        {Len + 1, Sum + pow(X - Mean, 2)};
+                    false ->
+                        {Len, Sum} % skip non finite values
+                end
+        end,
+    {Len, Sum} = lists:foldl(F, {0,0}, Numbers),
+    Sum / Len.
+
+stddev(Numbers) ->
+    sqrt(variance(Numbers)).
+
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+nan_to_num([], Acc)    ->
+    lists:reverse(Acc);
+nan_to_num([X|T], Acc) ->
+    nan_to_num(T, [nan_to_num(X) | Acc]).  
 
 sum([], Acc)                             ->
     Acc;
@@ -593,9 +614,4 @@ mean([X|T], {Sum, Len}) when is_number(X)        ->
     mean(T, {X + Sum, Len + 1});
 mean([X|T], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
     mean(T, {Sum, Len}).    % skip non finite values
-
-nan_to_num([], Acc)    ->
-    lists:reverse(Acc);
-nan_to_num([X|T], Acc) ->
-    nan_to_num(T, [nan_to_num(X) | Acc]).  
 
