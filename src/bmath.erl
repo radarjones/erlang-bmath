@@ -570,12 +570,18 @@ nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
 nan_to_num(X) when is_list(X)          ->
     nan_to_num(X,[]).
 
+%% @doc Computes the sum of a list of numbers. Numbers which are not finite
+%% are skipped and have no affect on the result.
 sum(Numbers) ->
     sum(Numbers, 0).
 
+%% @doc Computes the mean of a list of numbers. Numbers which are not finite
+%% are skipped and have no affect on the result.
 mean(Numbers) ->
     mean(Numbers, {0,0}).
 
+%% @doc Computes the variance of a list of numbers. Numbers which are not
+%% finite are skipped and have no affect on the result.
 variance(Numbers) ->
     Mean = mean(Numbers),
     F = fun(X, {Len, Sum}) -> 
@@ -589,6 +595,8 @@ variance(Numbers) ->
     {Len, Sum} = lists:foldl(F, {0,0}, Numbers),
     Sum / Len.
 
+%% @doc Computes the standard devation of a list of numbers. Numbers which are
+%% not finite are skipped and have no affect on the result.
 stddev(Numbers) ->
     sqrt(variance(Numbers)).
 
