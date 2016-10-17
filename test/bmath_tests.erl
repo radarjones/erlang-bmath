@@ -94,6 +94,10 @@ remainder_test() ->
 remquo_test() ->
     ?assertMatch({'-nan', 1}, bmath:remquo(inf, 1)).
 
+sum_test() ->
+    ?assert(bmath:sum([]) == 0),
+    ?assert(bmath:sum([nan,inf,'-nan','-inf',1,2,3]) == 6).
+
 stddev_test() ->
     ?assert(bmath:stddev([]) == 0),
     ?assert(bmath:stddev([2,4,4,4,5,5,7,9]) == 2),
