@@ -63,6 +63,7 @@ remquo_test() ->
     ?assertMatch({'-nan', 1}, bmath:remquo(inf, 1)).
 
 stddev_test() ->
+    ?assert(bmath:stddev([]) == 0),
     ?assert(bmath:stddev([2,4,4,4,5,5,7,9]) == 2),
     ?assert(bmath:stddev([inf,'-inf',nan,'-nan',2,4,4,4,5,5,7,9]) == 2).
 
