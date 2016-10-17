@@ -77,7 +77,7 @@
          fuzzy_compare/2, fuzzy_zero/1]).
 %% conversions
 -export([degrees_to_radians/1, radians_to_degrees/1, nan_to_num/1]).
-%% vector operations
+%% statistics 
 -export([sum/1, mean/1, variance/1, stddev/1]).
 
 -on_load(on_load/0).
@@ -551,19 +551,19 @@ fuzzy_compare(X, Y) ->
 fuzzy_zero(X) ->
     is_le(fabs(X), 0.000000000001).
 
--spec degrees_to_radians(Degrees) -> float() when
-      Degrees :: float().
 %% @doc Converts degrees to radians
 
-degrees_to_radians(Degrees) -> 
-    fmul(Degrees, ?BMATH_PI/180).
+degrees_to_radians(XS) when is_list(XS) ->
+    degrees_to_radians(XS, []);
+degrees_to_radians(X)                   -> 
+    fmul(X, ?BMATH_PI/180).
 
--spec radians_to_degrees(Radians) -> float() when
-      Radians :: float().
 %% @doc Converts radians to degrees
 
-radians_to_degrees(Radians) -> 
-    fmul(Radians, 180/?BMATH_PI).
+radians_to_degrees(XS) when is_list(XS) ->
+    radians_to_degrees(XS, []);
+radians_to_degrees(X)                   -> 
+    fmul(X, 180/?BMATH_PI).
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
@@ -572,21 +572,24 @@ nan_to_num(X) when is_list(X)          ->
 
 %% @doc Computes the sum of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
-sum([])      -> 0;
-sum(Numbers) ->
-    sum(Numbers, 0).
+
+sum([]) -> 0;
+sum(XS) ->
+    sum(XS, 0).
 
 %% @doc Computes the mean of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
-mean([])      -> 0;
-mean(Numbers) ->
-    mean(Numbers, {0,0}).
+
+mean([]) -> 0;
+mean(XS) ->
+    mean(XS, {0,0}).
 
 %% @doc Computes the variance of a list of numbers. Numbers which are not
 %% finite are skipped and have no affect on the result.
-variance([])      -> 0;
-variance(Numbers) ->
-    Mean = mean(Numbers),
+
+variance([]) -> 0;
+variance(XS) ->
+    Mean = mean(XS),
     F = fun(X, {Len, Sum}) -> 
                 case is_finite(X) of
                     true ->
@@ -595,35 +598,46 @@ variance(Numbers) ->
                         {Len, Sum} % skip non finite values
                 end
         end,
-    {Len, Sum} = lists:foldl(F, {0,0}, Numbers),
+    {Len, Sum} = lists:foldl(F, {0,0}, XS),
     Sum / Len.
 
 %% @doc Computes the standard devation of a list of numbers. Numbers which are
 %% not finite are skipped and have no affect on the result.
-stddev([])      -> 0;
-stddev(Numbers) ->
-    sqrt(variance(Numbers)).
+
+stddev([]) -> 0;
+stddev(XS) ->
+    sqrt(variance(XS)).
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
 
-nan_to_num([], Acc)    ->
+degrees_to_radians([], Acc)     ->
     lists:reverse(Acc);
-nan_to_num([X|T], Acc) ->
-    nan_to_num(T, [nan_to_num(X) | Acc]).  
+degrees_to_radians([X|XS], Acc) ->
+    degrees_to_radians(XS, [degrees_to_radians(X) | Acc]).
 
-sum([], Acc)                             ->
+radians_to_degrees([], Acc)     ->
+    lists:reverse(Acc);
+radians_to_degrees([X|XS], Acc) ->
+    radians_to_degrees(XS, [radians_to_degrees(X) | Acc]).
+
+nan_to_num([], Acc)     ->
+    lists:reverse(Acc);
+nan_to_num([X|XS], Acc) ->
+    nan_to_num(XS, [nan_to_num(X) | Acc]).  
+
+sum([], Acc)                              ->
     Acc;
-sum([X|T], Acc) when is_number(X)        ->
-    sum(T, X + Acc);
-sum([X|T], Acc) when ?BMATH_NOTFINITE(X) ->
-    sum(T, Acc).            % skip non finite values
+sum([X|XS], Acc) when is_number(X)        ->
+    sum(XS, X + Acc);
+sum([X|XS], Acc) when ?BMATH_NOTFINITE(X) ->
+    sum(XS, Acc).            % skip non finite values
 
-mean([], {Sum, Len})                             -> 
+mean([], {Sum, Len})                              -> 
     Sum / Len;
-mean([X|T], {Sum, Len}) when is_number(X)        ->
-    mean(T, {X + Sum, Len + 1});
-mean([X|T], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
-    mean(T, {Sum, Len}).    % skip non finite values
+mean([X|XS], {Sum, Len}) when is_number(X)        ->
+    mean(XS, {X + Sum, Len + 1});
+mean([X|XS], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
+    mean(XS, {Sum, Len}).    % skip non finite values
 
