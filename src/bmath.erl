@@ -42,9 +42,8 @@
 %%% not a number and infinity. 
 %%%
 %%% In addition to the C99 math functions, the library provides some common
-%%% math constants and other functions such as unit conversions and vector 
-%%% (list) operations. Note vector functions are not currently 
-%%% optimized with native code.
+%%% math constants and other functions such as unit conversions and statstics 
+%%% operations. 
 %%% 
 %%% @end
 %%%--------------------------------------------------------------------------- 
@@ -54,487 +53,461 @@
 
 -include("include/bmath.hrl").
 
-%% basic operations
--export([fadd/2, fsub/2, fmul/2, fdiv/2, fabs/1, fmod/2, remainder/2, 
-         remquo/2, fma/3, fmax/2, fmin/2, fdim/2, bound/3]).
-%% exponential functions
--export([exp/1, exp2/1, expm1/1, log/1, log10/1, log2/1, log1p/1]).
-%% power functions
--export([pow/2, sqrt/1, cbrt/1, hypot/2]).
-%% trigonometric functions
--export([sin/1, cos/1, tan/1, asin/1, acos/1, atan/1, atan2/2]).
-%% hyperbolic functions
--export([sinh/1, cosh/1, tanh/1, asinh/1, acosh/1, atanh/1]).
-%% error and gamma functions
--export([erf/1, erfc/1, tgamma/1, lgamma/1]).
-%% nearest integer floating-point operations
--export([ceil/1, floor/1, trunc/1, round/1]).
-%% floating-point manipulation functions
--export([modf/1, next_after/2, copy_sign/2]).
-%% classification and comparison
--export([classify/1, is_finite/1, is_inf/1, is_nan/1, is_normal/1,
-         is_gt/2, is_ge/2, is_lt/2, is_le/2, is_ltgt/2, is_unordered/2,
-         fuzzy_compare/2, fuzzy_zero/1]).
-%% conversions
--export([degrees_to_radians/1, radians_to_degrees/1, nan_to_num/1]).
-%% statistics 
--export([sum/1, mean/1, variance/1, stddev/1]).
-
--on_load(on_load/0).
+-export([fadd/2, fsub/2, fmul/2, fdiv/2, fabs/1, fmod/2, remainder/2,
+         remquo/2, fma/3, fmax/2, fmin/2, bound/3, fdim/2, exp/1, exp2/1,
+         expm1/1, log/1, log10/1, log2/1, log1p/1, pow/2, sqrt/1, cbrt/1,
+         hypot/2, sin/1, cos/1, tan/1, asin/1, acos/1, atan/1, atan2/2, 
+         sinh/1, cosh/1, tanh/1, asinh/1, acosh/1, atanh/1, erf/1, erfc/1,
+         tgamma/1, lgamma/1, ceil/1, floor/1, trunc/1, round/1, modf/1,
+         next_after/2, copy_sign/2, classify/1, is_normal/1, is_gt/2,
+         is_ge/2, is_lt/2, is_le/2, is_ltgt/2, is_unordered/2,
+         is_finite/1, is_infinity/1, is_nan/1, fuzzy_compare/2, fuzzy_zero/1,
+         degrees_to_radians/1, radians_to_degrees/1, nan_to_num/1, sum/1,
+         mean/1, variance/1, stddev/1]).
 
 -type nan() :: nan | '-nan'.
 -type infinity() :: inf | '-inf'.
 
 -export_type([nan/0, infinity/0]).
 
-%%====================================================================
-%% API
-%%====================================================================
-
-on_load() ->
-    PrivDir = case code:priv_dir(?MODULE) of
-                  {error, _} ->
-                      AppPath = filename:dirname(filename:dirname(
-                                                   code:which(?MODULE))),
-                      filename:join(AppPath, "priv");
-                  Path ->
-                      Path
-              end,
-    erlang:load_nif(filename:join(PrivDir, atom_to_list(?MODULE)), 0).
-
--spec fadd(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec fadd(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc X + Y
 
-fadd(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fadd(X,Y) -> 
+    bmath_libc:fadd(X,Y).
 
--spec fsub(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec fsub(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc X - Y 
 
-fsub(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fsub(X, Y) -> 
+    bmath_libc:fsub(X, Y).
 
--spec fmul(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec fmul(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc X * Y 
 
-fmul(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fmul(X, Y) -> 
+    bmath_libc:fmul(X, Y).
 
--spec fdiv(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec fdiv(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc X / Y 
 
-fdiv(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fdiv(X, Y) -> 
+    bmath_libc:fdiv(X, Y).
 
--spec fabs(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec fabs(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes the absolute value of X
 
-fabs(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fabs(X) -> 
+    bmath_libc:fabs(X).
 
--spec fmod(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec fmod(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Computes the floating-point remainder of the division operation X / Y
 
-fmod(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fmod(X, Y) -> 
+    bmath_libc:fmod(X, Y).
 
--spec remainder(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec remainder(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Computes signed remainder of the floating-point division operation 
 
-remainder(_X, _Y_) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+remainder(X, Y) -> 
+    bmath_libc:remainder(X, Y).
 
--spec remquo(_X, _Y) -> {float() | nan() | infinity(), integer()} when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec remquo(X, Y) -> {float() | nan() | infinity(), integer()} when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Computes signed remainder as well as the three last bits of the 
 %% division operation 
 
-remquo(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+remquo(X, Y) -> 
+    bmath_libc:remquo(X, Y).
 
--spec fma(_X, _Y, _Z) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity(),
-      _X :: number() | nan() | infinity().
+-spec fma(X, Y, Z) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity(),
+      Z :: number() | nan() | infinity().
 %% @doc Computes fused multiply-add operation
 
-fma(_X, _Y, _Z) -> 
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fma(X, Y, Z) -> 
+    bmath_libc:fma(X, Y, Z).
 
 -spec fmax(_X, _Y) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
 %% @doc Determines larger of two floating-point values.
 
-fmax(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fmax(X, Y) -> 
+    bmath_libc:fmax(X, Y).
 
 -spec fmin(_X, _Y) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
 %% @doc Determines smaller of two floating-point values  
 
-fmin(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fmin(X, Y) -> 
+    bmath_libc:fmin(X, Y).
 
--spec fdim(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+%% @doc Returns Value bounded by Min and Max
+bound(Value, Min, Max) -> 
+    fmax(Min, fmin(Max, Value)).
+
+-spec fdim(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Determines positive difference of two floating-point values 
 %% (max(0, x-y)) 
 
-fdim(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+fdim(X, Y) -> 
+    bmath_libc:fdim(X, Y).
 
-%% @doc Returns Value bounded by Min and Max
-
-bound(Value, Min, Max) ->
-    fmax(Min, fmin(Max, Value)).
-
--spec exp(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec exp(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes e raised to the given power
 
-exp(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+exp(X) ->
+    bmath_libc:exp(X).
 
--spec exp2(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec exp2(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes 2 raised to the given power
 
-exp2(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+exp2(X) ->
+    bmath_libc:exp2(X).
 
--spec expm1(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec expm1(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes e raised to the given power, minus one
 
-expm1(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+expm1(X) ->
+    bmath_libc:expm1(X).
 
--spec log(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec log(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes natural (base-e) logarithm
 
-log(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+log(X) ->
+    bmath_libc:log(X).
 
--spec log10(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec log10(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes the common (base-10) logarithm
 
-log10(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+log10(X) ->
+    bmath_libc:log10(X).
 
--spec log2(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec log2(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes the base-2 logarithm
 
-log2(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+log2(X) ->
+    bmath_libc:log2(X).
 
--spec log1p(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec log1p(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes the (base-e) logarithm of 1 plus the given number
 
-log1p(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+log1p(X) ->
+    bmath_libc:log1p(X).
 
--spec pow(_Base, _Exponent) -> float() | nan() | infinity() when
-      _Base :: number() | nan() | infinity(),
-      _Exponent :: number() | nan() | infinity().
+-spec pow(Base, Exponent) -> float() | nan() | infinity() when
+      Base :: number() | nan() | infinity(),
+      Exponent :: number() | nan() | infinity().
 %% @doc Computes a number raised to the given power
 
-pow(_Base, _Exponent) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+pow(Base, Exponent) ->
+    bmath_libc:pow(Base, Exponent).
 
--spec sqrt(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec sqrt(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes square root
 
-sqrt(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+sqrt(X) ->
+    bmath_libc:sqrt(X).
 
--spec cbrt(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec cbrt(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes cubic root
 
-cbrt(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+cbrt(X) ->
+    bmath_libc:cbrt(X).
 
--spec hypot(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec hypot(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Computes the square root of the sum of the squares of two given
 %% numbers.
 
-hypot(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+hypot(X, Y) ->
+    bmath_libc:hypot(X, Y).
 
--spec sin(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec sin(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes sine
 
-sin(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+sin(X) ->
+    bmath_libc:sin(X).
 
--spec cos(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec cos(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes cosine
 
-cos(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+cos(X) ->
+    bmath_libc:cos(X).
 
--spec tan(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec tan(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes tangent
 
-tan(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+tan(X) ->
+    bmath_libc:tan(X).
 
--spec asin(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec asin(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes arc sine
 
-asin(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+asin(X) ->
+    bmath_libc:asin(X).
 
--spec acos(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec acos(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes arc cosine
 
-acos(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+acos(X) ->
+    bmath_libc:acos(X).
 
--spec atan(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec atan(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes arc tangent
 
-atan(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+atan(X) ->
+    bmath_libc:atan(X).
 
--spec atan2(_Y, _X) -> float() | nan() | infinity() when
-      _Y :: number() | nan() | infinity(),
-      _X :: number() | nan() | infinity().
+-spec atan2(Y, X) -> float() | nan() | infinity() when
+      Y :: number() | nan() | infinity(),
+      X :: number() | nan() | infinity().
 %% @doc Computes arc tangent, using signs to determine quadrants
 
-atan2(_Y, _X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+atan2(Y, X) ->
+    bmath_libc:atan2(Y, X).
 
--spec sinh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec sinh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes hyperbolic sine 
 
-sinh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+sinh(X) ->
+    bmath_libc:sinh(X).
 
--spec cosh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec cosh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes hyperbolic cosine 
 
-cosh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+cosh(X) ->
+    bmath_libc:cosh(X).
 
--spec tanh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec tanh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes hyperbolic tangent 
 
-tanh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+tanh(X) ->
+    bmath_libc:tanh(X).
 
--spec asinh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec asinh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes inverse hyperbolic sine 
 
-asinh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+asinh(X) ->
+    bmath_libc:asinh(X).
 
--spec acosh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec acosh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes inverse hyperbolic cosine 
 
-acosh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+acosh(X) ->
+    bmath_libc:acosh(X).
 
--spec atanh(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec atanh(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes inverse hyperbolic tangent 
 
-atanh(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+atanh(X) ->
+    bmath_libc:atanh(X).
 
 -spec erf(_X) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity().
 %% @doc Computes error function
 
-erf(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+erf(X) ->
+    bmath_libc:erf(X).
 
 -spec erfc(_X) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity().
 %% @doc Computes complementary error function
 
-erfc(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+erfc(X) ->
+    bmath_libc:erfc(X).
 
 -spec tgamma(_X) -> float() | nan() | infinity() when
       _X :: number() | nan() | infinity().
 %% @doc Computes gamma function. 
 
-tgamma(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+tgamma(X) ->
+    bmath_libc:tgamma(X).
 
--spec lgamma(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec lgamma(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes natural (base-e) logarithm of the gamma function. 
 
-lgamma(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+lgamma(X) ->
+    bmath_libc:lgamma(X).
 
--spec ceil(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec ceil(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes smallest integer not less than the given value. 
 
-ceil(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+ceil(X) ->
+    bmath_libc:ceil(X).
 
--spec floor(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec floor(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Computes largest integer not greater than the given value. 
 
-floor(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+floor(X) ->
+    bmath_libc:floor(X).
 
--spec trunc(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec trunc(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Rounds to the nearest integer not greater in magnitude than the given
 %% value. 
+trunc(X) ->
+    bmath_libc:trunc(X).
 
-trunc(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
-
--spec round(_X) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity().
+-spec round(X) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity().
 %% @doc Rounds to the nearest integer, rounding away from zero in halfway 
 %% cases.
+round(X) ->
+    bmath_libc:round(X).
 
-round(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
-
--spec modf(_X) -> {float() | nan() | infinity(), float() | nan} when
-      _X :: number() | nan() | infinity().
+-spec modf(X) -> {float() | nan() | infinity(), float() | nan} when
+      X :: number() | nan() | infinity().
 %% @doc Breaks a number into integer and fractional parts
 
-modf(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+modf(X) ->
+    bmath_libc:modf(X).
 
--spec next_after(_From, _To) -> float() | nan() | infinity() when
-      _From :: number() | nan() | infinity(),
-      _To :: number() | nan() | infinity().
+-spec next_after(From, To) -> float() | nan() | infinity() when
+      From :: number() | nan() | infinity(),
+      To :: number() | nan() | infinity().
 %% @doc Determines next representable floating-point value towards the given 
 %% value 
 
-next_after(_From, _To) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+next_after(From, To) ->
+    bmath_libc:next_after(From, To).
 
--spec copy_sign(_X, _Y) -> float() | nan() | infinity() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec copy_sign(X, Y) -> float() | nan() | infinity() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Produces a value with the magnitude of a given value and the sign of
 %% another given value 
 
-copy_sign(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+copy_sign(X, Y) ->
+    bmath_libc:copy_sign(X, Y).
 
--spec classify(_X) -> inf | nan | normal | subnormal | zero | unknown when
-      _X :: number() | nan() | infinity().
+-spec classify(X) -> inf | nan | normal | subnormal | zero | unknown when
+      X :: number() | nan() | infinity().
 %% @doc Classifies the given floating-point value 
 
-classify(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+classify(X) ->
+    bmath_libc:classify(X).
 
-%% @doc Checks if the given value is finite
-is_finite(X) when is_float(X); is_integer(X) -> true;
-is_finite(X) when ?BMATH_NOTFINITE(X)        -> false.
-
-%% @doc Checks if the given value is infinite
-is_inf(X) when ?BMATH_ISINF(X)                             -> true;
-is_inf(X) when is_float(X); is_integer(X); ?BMATH_ISNAN(X) -> false.
-
-%% @doc Checks if the given value is NaN 
-is_nan(X) when ?BMATH_ISNAN(X)                             -> true;
-is_nan(X) when is_float(X); is_integer(X); ?BMATH_ISINF(X) -> false.
-
--spec is_normal(_X) -> boolean() when _X :: number() | nan() | infinity().
+-spec is_normal(X) -> boolean() when 
+      X :: number() | nan() | infinity().
 %% @doc Checks if the given number is normal.
 
-is_normal(_X) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_normal(X) ->
+    bmath_libc:is_normal(X).
 
--spec is_gt(_X, _Y) -> boolean() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec is_gt(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Checks if the first floating-point argument is greater than the second 
 
-is_gt(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_gt(X, Y) ->
+    bmath_libc:is_gt(X, Y).
 
--spec is_ge(_X, _Y) -> boolean() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec is_ge(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Checks if the first floating-point argument is greater or equal than
 %% the second 
 
-is_ge(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_ge(X, Y) ->
+    bmath_libc:is_ge(X, Y).
 
 -spec is_lt(_X, _Y) -> boolean() when
       _X :: number() | nan() | infinity(),
       _Y :: number() | nan() | infinity().
 %% @doc Checks if the first floating-point argument is less than the second 
 
-is_lt(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_lt(X, Y) ->
+    bmath_libc:is_lt(X, Y).
 
--spec is_le(_X, _Y) -> boolean() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec is_le(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Checks if the first floating-point argument is less or equal than 
 %% the second 
 
-is_le(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_le(X, Y) ->
+    bmath_libc:is_le(X, Y).
 
--spec is_ltgt(_X, _Y) -> boolean() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec is_ltgt(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Checks if the first floating-point argument is less or greater than 
 %% the second 
 
-is_ltgt(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_ltgt(X, Y) ->
+    bmath_libc:is_ltgt(X, Y).
 
--spec is_unordered(_X, _Y) -> boolean() when
-      _X :: number() | nan() | infinity(),
-      _Y :: number() | nan() | infinity().
+-spec is_unordered(X, Y) -> boolean() when
+      X :: number() | nan() | infinity(),
+      Y :: number() | nan() | infinity().
 %% @doc Checks if two floating-point values are unordered
 
-is_unordered(_X, _Y) ->
-    erlang:nif_error({nif_not_loaded, ?MODULE}).
+is_unordered(X, Y) ->
+    bmath_libc:is_unordered(X, Y).
+
+%% @doc Checks if the given value is finite
+is_finite(X) when is_number(X)        -> true;
+is_finite(X) when ?BMATH_NOTFINITE(X) -> false.
+
+%% @doc Checks if the given value is infinite
+is_infinity(X) when ?BMATH_ISINF(X)               -> true;
+is_infinity(X) when is_number(X); ?BMATH_ISNAN(X) -> false.
+
+%% @doc Checks if the given value is NaN 
+is_nan(Xs) when is_list(Xs) ->
+    is_nan(Xs, []);
+is_nan(X) when ?BMATH_ISNAN(X)               -> true;
+is_nan(X) when is_number(X); ?BMATH_ISINF(X) -> false.
+
+is_nan([], Acc) ->
+    lists:reverse(Acc);
+is_nan([X|Xs], Acc) ->
+    is_nan(Xs, [is_nan(X) | Acc]).
 
 -spec fuzzy_compare(X, Y) -> boolean() when
       X :: number() | nan() | infinity(),
@@ -548,48 +521,81 @@ fuzzy_compare(X, Y) ->
       X :: number() | nan() | infinity().
 %% @doc Checks if a number is condisered zero. 
 
+fuzzy_zero(Xs) when is_list(Xs) ->
+    fuzzy_zero(Xs, []);
 fuzzy_zero(X) ->
     is_le(fabs(X), 0.000000000001).
 
-%% @doc Converts degrees to radians
+fuzzy_zero([], Acc) ->
+    lists:reverse(Acc);
+fuzzy_zero([X|Xs], Acc) ->
+    fuzzy_zero(Xs, [fuzzy_zero(X) | Acc]).
 
-degrees_to_radians(XS) when is_list(XS) ->
-    degrees_to_radians(XS, []);
+%% @doc Converts degrees to radians
+degrees_to_radians(Xs) when is_list(Xs) ->
+    degrees_to_radians(Xs, []);
 degrees_to_radians(X)                   -> 
     fmul(X, ?BMATH_PI/180).
 
-%% @doc Converts radians to degrees
+degrees_to_radians([], Acc)     ->
+    lists:reverse(Acc);
+degrees_to_radians([X|Xs], Acc) ->
+    degrees_to_radians(Xs, [degrees_to_radians(X) | Acc]).
 
-radians_to_degrees(XS) when is_list(XS) ->
-    radians_to_degrees(XS, []);
+%% @doc Converts radians to degrees
+radians_to_degrees(Xs) when is_list(Xs) ->
+    radians_to_degrees(Xs, []);
 radians_to_degrees(X)                   -> 
     fmul(X, 180/?BMATH_PI).
+
+radians_to_degrees([], Acc)     ->
+    lists:reverse(Acc);
+radians_to_degrees([X|Xs], Acc) ->
+    radians_to_degrees(Xs, [radians_to_degrees(X) | Acc]).
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
 nan_to_num(X) when is_list(X)          ->
     nan_to_num(X,[]).
 
+nan_to_num([], Acc)     ->
+    lists:reverse(Acc);
+nan_to_num([X|Xs], Acc) ->
+    nan_to_num(Xs, [nan_to_num(X) | Acc]).  
+
 %% @doc Computes the sum of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
-
 sum([]) -> 0;
-sum(XS) ->
-    sum(XS, 0).
+sum(Xs) ->
+    sum(Xs, 0).
+
+sum([], Acc)                              ->
+    Acc;
+sum([X|Xs], Acc) when is_number(X)        ->
+    sum(Xs, X + Acc);
+sum([X|Xs], Acc) when ?BMATH_NOTFINITE(X) ->
+    sum(Xs, Acc).            % skip non finite values
 
 %% @doc Computes the mean of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
 
 mean([]) -> 0;
-mean(XS) ->
-    mean(XS, {0,0}).
+mean(Xs) ->
+    mean(Xs, {0,0}).
+
+mean([], {Sum, Len})                              -> 
+    Sum / Len;
+mean([X|Xs], {Sum, Len}) when is_number(X)        ->
+    mean(Xs, {X + Sum, Len + 1});
+mean([X|Xs], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
+    mean(Xs, {Sum, Len}).    % skip non finite values
 
 %% @doc Computes the variance of a list of numbers. Numbers which are not
 %% finite are skipped and have no affect on the result.
 
 variance([]) -> 0;
-variance(XS) ->
-    Mean = mean(XS),
+variance(Xs) ->
+    Mean = mean(Xs),
     F = fun(X, {Len, Sum}) -> 
                 case is_finite(X) of
                     true ->
@@ -598,46 +604,13 @@ variance(XS) ->
                         {Len, Sum} % skip non finite values
                 end
         end,
-    {Len, Sum} = lists:foldl(F, {0,0}, XS),
+    {Len, Sum} = lists:foldl(F, {0,0}, Xs),
     Sum / Len.
 
 %% @doc Computes the standard devation of a list of numbers. Numbers which are
 %% not finite are skipped and have no affect on the result.
 
 stddev([]) -> 0;
-stddev(XS) ->
-    sqrt(variance(XS)).
-
-%%====================================================================
-%% Internal functions
-%%====================================================================
-
-degrees_to_radians([], Acc)     ->
-    lists:reverse(Acc);
-degrees_to_radians([X|XS], Acc) ->
-    degrees_to_radians(XS, [degrees_to_radians(X) | Acc]).
-
-radians_to_degrees([], Acc)     ->
-    lists:reverse(Acc);
-radians_to_degrees([X|XS], Acc) ->
-    radians_to_degrees(XS, [radians_to_degrees(X) | Acc]).
-
-nan_to_num([], Acc)     ->
-    lists:reverse(Acc);
-nan_to_num([X|XS], Acc) ->
-    nan_to_num(XS, [nan_to_num(X) | Acc]).  
-
-sum([], Acc)                              ->
-    Acc;
-sum([X|XS], Acc) when is_number(X)        ->
-    sum(XS, X + Acc);
-sum([X|XS], Acc) when ?BMATH_NOTFINITE(X) ->
-    sum(XS, Acc).            % skip non finite values
-
-mean([], {Sum, Len})                              -> 
-    Sum / Len;
-mean([X|XS], {Sum, Len}) when is_number(X)        ->
-    mean(XS, {X + Sum, Len + 1});
-mean([X|XS], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
-    mean(XS, {Sum, Len}).    % skip non finite values
+stddev(Xs) ->
+    sqrt(variance(Xs)).
 

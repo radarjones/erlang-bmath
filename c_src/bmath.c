@@ -953,5 +953,5 @@ unload(ErlNifEnv *env, void *priv_data)
 	load_count--;
 }
 
-ERL_NIF_INIT(bmath, nif_funcs, load, NULL, upgrade, unload)
+ERL_NIF_INIT(bmath_libc, nif_funcs, load, NULL, upgrade, unload)
 
