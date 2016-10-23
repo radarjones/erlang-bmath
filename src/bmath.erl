@@ -510,22 +510,24 @@ is_nan(X) when is_number(X); ?BMATH_ISINF(X) -> false.
 %% @doc Compares two floats in a relative way to see if they are equal. 
 
 fuzzy_compare(X, Y) ->
-    is_le(fmul(fabs(fsub(X,Y)),1000000000000.0),fmin(fabs(X),fabs(Y))).
+    bmath_libc:is_le(
+      bmath_libc:fmul(bmath_libc:fabs(bmath_libc:fsub(X,Y)),1000000000000.0),
+      bmath_libc:fmin(bmath_libc:fabs(X),bmath_libc:fabs(Y))).
 
 -spec fuzzy_zero(X) -> boolean() when
       X :: number() | nan() | infinity().
 %% @doc Checks if a number is condisered zero. 
 
 fuzzy_zero(X) ->
-    is_le(fabs(X), 0.000000000001).
+    bmath_libc:is_le(fabs(X), 0.000000000001).
 
 %% @doc Converts degrees to radians
 degrees_to_radians(X) -> 
-    fmul(X, ?BMATH_PI/180).
+    bmath_libc:fmul(X, ?BMATH_PI/180).
 
 %% @doc Converts radians to degrees
 radians_to_degrees(X) -> 
-    fmul(X, 180/?BMATH_PI).
+    bmath_libc:fmul(X, 180/?BMATH_PI).
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
@@ -576,7 +578,7 @@ variance(Xs) ->
     F = fun(X, {Len, Sum}) -> 
                 case is_finite(X) of
                     true ->
-                        {Len + 1, Sum + pow(X - Mean, 2)};
+                        {Len + 1, Sum + bmath_libc:pow(X - Mean, 2)};
                     false ->
                         {Len, Sum} % skip non finite values
                 end
