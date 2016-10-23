@@ -390,6 +390,7 @@ floor(X) ->
       X :: number() | nan() | infinity().
 %% @doc Rounds to the nearest integer not greater in magnitude than the given
 %% value. 
+
 trunc(X) ->
     bmath_libc:trunc(X).
 
@@ -397,6 +398,7 @@ trunc(X) ->
       X :: number() | nan() | infinity().
 %% @doc Rounds to the nearest integer, rounding away from zero in halfway 
 %% cases.
+
 round(X) ->
     bmath_libc:round(X).
 
@@ -499,15 +501,8 @@ is_infinity(X) when ?BMATH_ISINF(X)               -> true;
 is_infinity(X) when is_number(X); ?BMATH_ISNAN(X) -> false.
 
 %% @doc Checks if the given value is NaN 
-is_nan(Xs) when is_list(Xs) ->
-    is_nan(Xs, []);
 is_nan(X) when ?BMATH_ISNAN(X)               -> true;
 is_nan(X) when is_number(X); ?BMATH_ISINF(X) -> false.
-
-is_nan([], Acc) ->
-    lists:reverse(Acc);
-is_nan([X|Xs], Acc) ->
-    is_nan(Xs, [is_nan(X) | Acc]).
 
 -spec fuzzy_compare(X, Y) -> boolean() when
       X :: number() | nan() | infinity(),
@@ -521,42 +516,21 @@ fuzzy_compare(X, Y) ->
       X :: number() | nan() | infinity().
 %% @doc Checks if a number is condisered zero. 
 
-fuzzy_zero(Xs) when is_list(Xs) ->
-    fuzzy_zero(Xs, []);
 fuzzy_zero(X) ->
     is_le(fabs(X), 0.000000000001).
 
-fuzzy_zero([], Acc) ->
-    lists:reverse(Acc);
-fuzzy_zero([X|Xs], Acc) ->
-    fuzzy_zero(Xs, [fuzzy_zero(X) | Acc]).
-
 %% @doc Converts degrees to radians
-degrees_to_radians(Xs) when is_list(Xs) ->
-    degrees_to_radians(Xs, []);
-degrees_to_radians(X)                   -> 
+degrees_to_radians(X) -> 
     fmul(X, ?BMATH_PI/180).
 
-degrees_to_radians([], Acc)     ->
-    lists:reverse(Acc);
-degrees_to_radians([X|Xs], Acc) ->
-    degrees_to_radians(Xs, [degrees_to_radians(X) | Acc]).
-
 %% @doc Converts radians to degrees
-radians_to_degrees(Xs) when is_list(Xs) ->
-    radians_to_degrees(Xs, []);
-radians_to_degrees(X)                   -> 
+radians_to_degrees(X) -> 
     fmul(X, 180/?BMATH_PI).
-
-radians_to_degrees([], Acc)     ->
-    lists:reverse(Acc);
-radians_to_degrees([X|Xs], Acc) ->
-    radians_to_degrees(Xs, [radians_to_degrees(X) | Acc]).
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
-nan_to_num(X) when is_list(X)          ->
-    nan_to_num(X,[]).
+nan_to_num(Xs) when is_list(Xs)        ->
+    nan_to_num(Xs,[]).
 
 nan_to_num([], Acc)     ->
     lists:reverse(Acc);
@@ -567,28 +541,31 @@ nan_to_num([X|Xs], Acc) ->
 %% are skipped and have no affect on the result.
 sum([]) -> 0;
 sum(Xs) ->
-    sum(Xs, 0).
-
-sum([], Acc)                              ->
-    Acc;
-sum([X|Xs], Acc) when is_number(X)        ->
-    sum(Xs, X + Acc);
-sum([X|Xs], Acc) when ?BMATH_NOTFINITE(X) ->
-    sum(Xs, Acc).            % skip non finite values
+    F = fun(X, Acc) ->
+                case is_finite(X) of 
+                    true ->
+                        Acc + X;
+                    false ->
+                        Acc % skip non finite values
+                end
+        end,
+    lists:foldl(F, 0, Xs).
 
 %% @doc Computes the mean of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
 
 mean([]) -> 0;
 mean(Xs) ->
-    mean(Xs, {0,0}).
-
-mean([], {Sum, Len})                              -> 
-    Sum / Len;
-mean([X|Xs], {Sum, Len}) when is_number(X)        ->
-    mean(Xs, {X + Sum, Len + 1});
-mean([X|Xs], {Sum, Len}) when ?BMATH_NOTFINITE(X) ->
-    mean(Xs, {Sum, Len}).    % skip non finite values
+    F = fun(X, {Len, Sum}) ->
+                case is_finite(X) of
+                    true ->
+                        {Len + 1, Sum + X};
+                    false ->
+                        {Sum, Len} % skip non finite values
+                end
+        end,
+    {Len, Sum} = lists:foldl(F, {0,0}, Xs),
+    Sum / Len.
 
 %% @doc Computes the variance of a list of numbers. Numbers which are not
 %% finite are skipped and have no affect on the result.
