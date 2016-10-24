@@ -71,21 +71,35 @@
 
 -export_type([nan/0, infinity/0, num/0]).
 
--spec fadd(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+-spec fadd(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc X + Y
 
-fadd(X,Y) -> 
+fadd(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fadd(Xs, Ys, []);
+fadd(X,Y)                                  -> 
     bmath_libc:fadd(X,Y).
 
--spec fsub(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+fadd([], [], Acc)         ->
+    lists:reverse(Acc);
+fadd([X|Xs], [Y|Ys], Acc) ->
+    fadd(Xs, Ys, [bmath_libc:fadd(X, Y) | Acc]).
+
+-spec fsub(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc X - Y 
 
-fsub(X, Y) -> 
+fsub(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fsub(Xs, Ys, []);
+fsub(X, Y)                                 -> 
     bmath_libc:fsub(X, Y).
+
+fsub([], [], Acc)         ->
+    lists:reverse(Acc);
+fsub([X|Xs], [Y|Ys], Acc) ->
+    fsub(Xs, Ys, [bmath_libc:fsub(X, Y) | Acc]).
 
 -spec fmul(X, Y) -> num() when
       X :: num(),
@@ -238,7 +252,7 @@ pow(Base, Exponent) ->
 
 sqrt(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:sqrt(X) end, Xs);
-sqrt(X) ->
+sqrt(X)                   ->
     bmath_libc:sqrt(X).
 
 -spec cbrt(X) -> num() | [num()] when
@@ -247,7 +261,7 @@ sqrt(X) ->
 
 cbrt(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:cbrt(X) end, Xs);
-cbrt(X) ->
+cbrt(X)                   ->
     bmath_libc:cbrt(X).
 
 -spec hypot(X, Y) -> num() when
@@ -265,7 +279,7 @@ hypot(X, Y) ->
 
 sin(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:sin(X) end, Xs);
-sin(X) ->
+sin(X)                   ->
     bmath_libc:sin(X).
 
 -spec cos(X) -> num() | [num()] when
@@ -274,7 +288,7 @@ sin(X) ->
 
 cos(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:cos(X) end, Xs);
-cos(X) ->
+cos(X)                   ->
     bmath_libc:cos(X).
 
 -spec tan(X) -> num() | [num()] when
@@ -283,7 +297,7 @@ cos(X) ->
 
 tan(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:tan(X) end, Xs);
-tan(X) ->
+tan(X)                   ->
     bmath_libc:tan(X).
 
 -spec asin(X) -> num() | [num()] when
@@ -292,7 +306,7 @@ tan(X) ->
 
 asin(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:asin(X) end, Xs);
-asin(X) ->
+asin(X)                   ->
     bmath_libc:asin(X).
 
 -spec acos(X) -> num() | [num()] when
@@ -301,7 +315,7 @@ asin(X) ->
 
 acos(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:acos(X) end, Xs);
-acos(X) ->
+acos(X)                   ->
     bmath_libc:acos(X).
 
 -spec atan(X) -> num() | [num()] when
@@ -310,7 +324,7 @@ acos(X) ->
 
 atan(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:atan(X) end, Xs);
-atan(X) ->
+atan(X)                   ->
     bmath_libc:atan(X).
 
 -spec atan2(Y, X) -> num() when
@@ -348,7 +362,7 @@ tanh(X) ->
 
 asinh(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:asinh(X) end, Xs);
-asinh(X) ->
+asinh(X)                   ->
     bmath_libc:asinh(X).
 
 -spec acosh(X) -> num() | [num()] when
@@ -357,7 +371,7 @@ asinh(X) ->
 
 acosh(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:acosh(X) end, Xs);
-acosh(X) ->
+acosh(X)                   ->
     bmath_libc:acosh(X).
 
 -spec atanh(X) -> num() | [num()] when
@@ -366,7 +380,7 @@ acosh(X) ->
 
 atanh(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:atanh(X) end, Xs);
-atanh(X) ->
+atanh(X)                   ->
     bmath_libc:atanh(X).
 
 -spec erf(_X) -> num() when
@@ -403,7 +417,7 @@ lgamma(X) ->
 
 ceil(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:ceil(X) end, Xs);
-ceil(X) ->
+ceil(X)                   ->
     bmath_libc:ceil(X).
 
 -spec floor(X) -> num() | [num()] when
@@ -412,7 +426,7 @@ ceil(X) ->
 
 floor(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:floor(X) end, Xs);
-floor(X) ->
+floor(X)                   ->
     bmath_libc:floor(X).
 
 -spec trunc(X) -> num() | [num()] when
@@ -422,7 +436,7 @@ floor(X) ->
 
 trunc(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:trunc(X) end, Xs);
-trunc(X) ->
+trunc(X)                   ->
     bmath_libc:trunc(X).
 
 -spec round(X) -> num() when
