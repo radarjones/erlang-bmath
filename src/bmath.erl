@@ -232,8 +232,8 @@ log1p(X) ->
 pow(Base, Exponent) ->
     bmath_libc:pow(Base, Exponent).
 
--spec sqrt(X) -> num() when
-      X :: num().
+-spec sqrt(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes square root
 
 sqrt(Xs) when is_list(Xs) ->
@@ -241,8 +241,8 @@ sqrt(Xs) when is_list(Xs) ->
 sqrt(X) ->
     bmath_libc:sqrt(X).
 
--spec cbrt(X) -> num() when
-      X :: num().
+-spec cbrt(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes cubic root
 
 cbrt(Xs) when is_list(Xs) ->
@@ -259,45 +259,57 @@ cbrt(X) ->
 hypot(X, Y) ->
     bmath_libc:hypot(X, Y).
 
--spec sin(X) -> num() when
-      X :: num().
+-spec sin(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes sine
 
+sin(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:sin(X) end, Xs);
 sin(X) ->
     bmath_libc:sin(X).
 
--spec cos(X) -> num() when
-      X :: num().
+-spec cos(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes cosine
 
+cos(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:cos(X) end, Xs);
 cos(X) ->
     bmath_libc:cos(X).
 
--spec tan(X) -> num() when
-      X :: num().
+-spec tan(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes tangent
 
+tan(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:tan(X) end, Xs);
 tan(X) ->
     bmath_libc:tan(X).
 
--spec asin(X) -> num() when
-      X :: num().
+-spec asin(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes arc sine
 
+asin(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:asin(X) end, Xs);
 asin(X) ->
     bmath_libc:asin(X).
 
--spec acos(X) -> num() when
-      X :: num().
+-spec acos(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes arc cosine
 
+acos(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:acos(X) end, Xs);
 acos(X) ->
     bmath_libc:acos(X).
 
--spec atan(X) -> num() when
-      X :: num().
+-spec atan(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes arc tangent
 
+atan(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:atan(X) end, Xs);
 atan(X) ->
     bmath_libc:atan(X).
 
@@ -330,24 +342,30 @@ cosh(X) ->
 tanh(X) ->
     bmath_libc:tanh(X).
 
--spec asinh(X) -> num() when
-      X :: num().
+-spec asinh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes inverse hyperbolic sine 
 
+asinh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:asinh(X) end, Xs);
 asinh(X) ->
     bmath_libc:asinh(X).
 
--spec acosh(X) -> num() when
-      X :: num().
+-spec acosh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes inverse hyperbolic cosine 
 
+acosh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:acosh(X) end, Xs);
 acosh(X) ->
     bmath_libc:acosh(X).
 
--spec atanh(X) -> num() when
-      X :: num().
+-spec atanh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes inverse hyperbolic tangent 
 
+atanh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:atanh(X) end, Xs);
 atanh(X) ->
     bmath_libc:atanh(X).
 
@@ -379,25 +397,31 @@ tgamma(X) ->
 lgamma(X) ->
     bmath_libc:lgamma(X).
 
--spec ceil(X) -> num() when
-      X :: num().
+-spec ceil(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes smallest integer not less than the given value. 
 
+ceil(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:ceil(X) end, Xs);
 ceil(X) ->
     bmath_libc:ceil(X).
 
--spec floor(X) -> num() when
-      X :: num().
+-spec floor(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes largest integer not greater than the given value. 
 
+floor(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:floor(X) end, Xs);
 floor(X) ->
     bmath_libc:floor(X).
 
--spec trunc(X) -> num() when
-      X :: num().
+-spec trunc(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Rounds to the nearest integer not greater in magnitude than the given
 %% value. 
 
+trunc(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:trunc(X) end, Xs);
 trunc(X) ->
     bmath_libc:trunc(X).
 
@@ -443,8 +467,8 @@ classify(Xs) when is_list(Xs) ->
 classify(X) ->
     bmath_libc:classify(X).
 
--spec is_normal(X) -> boolean() when 
-      X :: num().
+-spec is_normal(X) -> boolean() | [boolean()] when 
+      X :: num() | [num()].
 %% @doc Checks if the given number is normal.
 
 is_normal(Xs) when is_list(Xs) ->
