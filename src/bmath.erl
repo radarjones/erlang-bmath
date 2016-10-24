@@ -531,13 +531,8 @@ radians_to_degrees(X) ->
 
 nan_to_num(X) when is_number(X)        -> X;
 nan_to_num(X) when ?BMATH_NOTFINITE(X) -> 0;
-nan_to_num(Xs) when is_list(Xs)        ->
-    nan_to_num(Xs,[]).
-
-nan_to_num([], Acc)     ->
-    lists:reverse(Acc);
-nan_to_num([X|Xs], Acc) ->
-    nan_to_num(Xs, [nan_to_num(X) | Acc]).  
+nan_to_num(Xs)                         ->
+    lists:map(fun(X) -> nan_to_num(X) end, Xs).
 
 %% @doc Computes the sum of a list of numbers. Numbers which are not finite
 %% are skipped and have no affect on the result.
