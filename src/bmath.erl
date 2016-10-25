@@ -101,21 +101,35 @@ fsub([], [], Acc)         ->
 fsub([X|Xs], [Y|Ys], Acc) ->
     fsub(Xs, Ys, [bmath_libc:fsub(X, Y) | Acc]).
 
--spec fmul(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+-spec fmul(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc X * Y 
 
-fmul(X, Y) -> 
+fmul(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fmul(Xs, Ys, []);
+fmul(X, Y)                                 -> 
     bmath_libc:fmul(X, Y).
 
--spec fdiv(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+fmul([], [], Acc)         ->
+    lists:reverse(Acc);
+fmul([X|Xs], [Y|Ys], Acc) ->
+    fmul(Xs, Ys, [bmath_libc:fmul(X, Y) | Acc]).
+
+-spec fdiv(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc X / Y 
 
+fdiv(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fdiv(Xs, Ys, []);
 fdiv(X, Y) -> 
     bmath_libc:fdiv(X, Y).
+
+fdiv([], [], Acc)         ->
+    lists:reverse(Acc);
+fdiv([X|Xs], [Y|Ys], Acc) ->
+    fdiv(Xs, Ys, [bmath_libc:fdiv(X, Y) | Acc]).
 
 -spec fabs(X) -> num() | [num()] when
       X :: num() | [num()].
@@ -123,128 +137,205 @@ fdiv(X, Y) ->
 
 fabs(Xs) when is_list(Xs) ->
     lists:map(fun(X) -> bmath_libc:fabs(X) end, Xs);
-fabs(X) -> 
+fabs(X)                   -> 
     bmath_libc:fabs(X).
 
--spec fmod(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+-spec fmod(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Computes the floating-point remainder of the division operation X / Y
 
-fmod(X, Y) -> 
+fmod(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fmod(Xs, Ys, []);
+fmod(X, Y)                                 -> 
     bmath_libc:fmod(X, Y).
 
--spec remainder(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+fmod([], [], Acc)         ->
+    lists:reverse(Acc);
+fmod([X|Xs], [Y|Ys], Acc) ->
+    fmod(Xs, Ys, [bmath_libc:fmod(X, Y) | Acc]).
+
+-spec remainder(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Computes signed remainder of the floating-point division operation 
 
-remainder(X, Y) -> 
+remainder(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    remainder(Xs, Ys, []);
+remainder(X, Y)                                 -> 
     bmath_libc:remainder(X, Y).
 
--spec remquo(X, Y) -> {num(), integer()} when
-      X :: num(),
-      Y :: num().
+remainder([], [], Acc)         ->
+    lists:reverse(Acc);
+remainder([X|Xs], [Y|Ys], Acc) ->
+    remainder(Xs, Ys, [bmath_libc:remainder(X, Y) | Acc]).
+
+-spec remquo(X, Y) -> {num(), integer()} | [{num(), integer()}]   when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Computes signed remainder as well as the three last bits of the 
 %% division operation 
 
-remquo(X, Y) -> 
+remquo(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+   remquo(Xs, Ys, []); 
+remquo(X, Y)                                 -> 
     bmath_libc:remquo(X, Y).
 
--spec fma(X, Y, Z) -> num() when
-      X :: num(),
-      Y :: num(),
-      Z :: num().
+remquo([], [], Acc)         ->
+    lists:reverse(Acc);
+remquo([X|Xs], [Y|Ys], Acc) ->
+    remquo(Xs, Ys, [bmath_libc:remquo(X, Y) | Acc]). 
+
+-spec fma(X, Y, Z) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()],
+      Z :: num() | [num()].
 %% @doc Computes fused multiply-add operation
 
-fma(X, Y, Z) -> 
+fma(Xs, Ys, Zs) when is_list(Xs), is_list(Ys), is_list(Zs) ->
+    fma(Xs, Ys, Zs, []);
+fma(X, Y, Z)                                               -> 
     bmath_libc:fma(X, Y, Z).
 
--spec fmax(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+fma([], [], [], Acc)             ->
+    lists:reverse(Acc);
+fma([X|Xs], [Y|Ys], [Z|Zs], Acc) ->
+    fma(Xs, Ys, Zs, [bmath_libc:fma(X, Y, Z) | Acc]).
+
+-spec fmax(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Determines larger of two floating-point values.
 
+fmax(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fmax(Xs, Ys, []);
 fmax(X, Y) -> 
     bmath_libc:fmax(X, Y).
 
--spec fmin(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+fmax([], [], Acc)         ->
+    lists:reverse(Acc);
+fmax([X|Xs], [Y|Ys], Acc) ->
+    fmax(Xs, Ys, [bmath_libc:fmax(X, Y) | Acc]).
+
+-spec fmin(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Determines smaller of two floating-point values  
 
-fmin(X, Y) -> 
+fmin(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fmin(Xs, Ys, []);
+fmin(X, Y)                                 -> 
     bmath_libc:fmin(X, Y).
 
+fmin([], [], Acc)         ->
+    lists:reverse(Acc);
+fmin([X|Xs], [Y|Ys], Acc) ->
+    fmin(Xs, Ys, [bmath_libc:fmin(X, Y) | Acc]).
+
 %% @doc Returns Value bounded by Min and Max
-bound(Value, Min, Max) -> 
+bound(Values, Mins, Maxs) when is_list(Values), is_list(Mins), is_list(Maxs) ->
+    bound(Values, Mins, Maxs, []);
+bound(Value, Min, Max)                                                       -> 
     fmax(Min, fmin(Max, Value)).
 
--spec fdim(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+bound([], [], [], Acc)                             ->
+    lists:reverse(Acc);
+bound([Value|Values], [Min|Mins], [Max|Maxs], Acc) ->
+    bound(Values, Mins, Maxs, [bound(Value, Min, Max) | Acc]).
+
+-spec fdim(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Determines positive difference of two floating-point values 
 %% (max(0, x-y)) 
 
+fdim(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    fdim(Xs, Ys, []);
 fdim(X, Y) -> 
     bmath_libc:fdim(X, Y).
 
--spec exp(X) -> num() when
-      X :: num().
+fdim([], [], Acc)         ->
+    lists:reverse(Acc);
+fdim([X|Xs], [Y|Ys], Acc) ->
+    fdim(Xs, Ys, [bmath_libc:fdim(X, Y) | Acc]).
+
+-spec exp(X) -> num()  | [num()] when
+      X :: num() | [num()].
 %% @doc Computes e raised to the given power
 
-exp(X) ->
+exp(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:exp(X) end, Xs);
+exp(X)                   ->
     bmath_libc:exp(X).
 
--spec exp2(X) -> num() when
-      X :: num().
+-spec exp2(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes 2 raised to the given power
 
-exp2(X) ->
+exp2(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:exp2(X) end, Xs);
+exp2(X)                   ->
     bmath_libc:exp2(X).
 
--spec expm1(X) -> num() when
-      X :: num().
+-spec expm1(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes e raised to the given power, minus one
 
-expm1(X) ->
+expm1(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:expm1(X) end, Xs);
+expm1(X)                   ->
     bmath_libc:expm1(X).
 
--spec log(X) -> num() when
-      X :: num().
+-spec log(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes natural (base-e) logarithm
 
-log(X) ->
+log(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:log(X) end, Xs);
+log(X)                   ->
     bmath_libc:log(X).
 
--spec log10(X) -> num() when
-      X :: num().
+-spec log10(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes the common (base-10) logarithm
 
-log10(X) ->
+log10(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:log10(X) end, Xs);
+log10(X)                   ->
     bmath_libc:log10(X).
 
--spec log2(X) -> num() when
-      X :: num().
+-spec log2(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes the base-2 logarithm
 
-log2(X) ->
+log2(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:log2(X) end, Xs);
+log2(X)                   ->
     bmath_libc:log2(X).
 
--spec log1p(X) -> num() when
-      X :: num().
+-spec log1p(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes the (base-e) logarithm of 1 plus the given number
 
-log1p(X) ->
+log1p(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:log1p(X) end, Xs);
+log1p(X)                   ->
     bmath_libc:log1p(X).
 
--spec pow(Base, Exponent) -> num() when
-      Base :: num(),
-      Exponent :: num().
+-spec pow(Base, Exponent) -> num() | [num()] when
+      Base :: num() | [num()],
+      Exponent :: num() | [num()].
 %% @doc Computes a number raised to the given power
 
-pow(Base, Exponent) ->
+pow(Bases, Exponents) when is_list(Bases), is_list(Exponents) ->
+    pow(Bases, Exponents, []);
+pow(Base, Exponent)                                           ->
     bmath_libc:pow(Base, Exponent).
+
+pow([], [], Acc)                             ->
+    lists:reverse(Acc);
+pow([Base|Bases], [Exponent|Exponents], Acc) ->
+    pow(Bases, Exponents, [bmath_libc:pow(Base, Exponent) | Acc]).
 
 -spec sqrt(X) -> num() | [num()] when
       X :: num() | [num()].
@@ -264,14 +355,21 @@ cbrt(Xs) when is_list(Xs) ->
 cbrt(X)                   ->
     bmath_libc:cbrt(X).
 
--spec hypot(X, Y) -> num() when
-      X :: num(),
-      Y :: num().
+-spec hypot(X, Y) -> num() | [num()] when
+      X :: num() | [num()],
+      Y :: num() | [num()].
 %% @doc Computes the square root of the sum of the squares of two given
 %% numbers.
 
-hypot(X, Y) ->
+hypot(Xs, Ys) when is_list(Xs), is_list(Ys) ->
+    hypot(Xs, Ys, []);
+hypot(X, Y)                                 ->
     bmath_libc:hypot(X, Y).
+
+hypot([], [], Acc)         ->
+    lists:reverse(Acc);
+hypot([X|Xs], [Y|Ys], Acc) ->
+    hypot(Xs, Ys, [bmath_libc:hypot(X, Y) | Acc]).
 
 -spec sin(X) -> num() | [num()] when
       X :: num() | [num()].
@@ -327,32 +425,45 @@ atan(Xs) when is_list(Xs) ->
 atan(X)                   ->
     bmath_libc:atan(X).
 
--spec atan2(Y, X) -> num() when
-      Y :: num(),
-      X :: num().
+-spec atan2(Y, X) -> num() | [num()] when
+      Y :: num() | [num()],
+      X :: num() | [num()].
 %% @doc Computes arc tangent, using signs to determine quadrants
 
-atan2(Y, X) ->
+atan2(Ys, Xs) when is_list(Ys), is_list(Xs) ->
+    atan2(Ys, Xs, []);
+atan2(Y, X)                                 ->
     bmath_libc:atan2(Y, X).
 
--spec sinh(X) -> num() when
-      X :: num().
+atan2([], [], Acc)         ->
+    lists:reverse(Acc);
+atan2([Y|Ys], [X|Xs], Acc) ->
+    atan2(Ys, Xs, [bmath_libc:atan2(Y, X) | Acc]).
+
+-spec sinh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes hyperbolic sine 
 
-sinh(X) ->
+sinh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:sinh(X) end, Xs);
+sinh(X)                   ->
     bmath_libc:sinh(X).
 
--spec cosh(X) -> num() when
-      X :: num().
+-spec cosh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes hyperbolic cosine 
 
+cosh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:cosh(X) end, Xs);
 cosh(X) ->
     bmath_libc:cosh(X).
 
--spec tanh(X) -> num() when
-      X :: num().
+-spec tanh(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes hyperbolic tangent 
 
+tanh(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:tanh(X) end, Xs);
 tanh(X) ->
     bmath_libc:tanh(X).
 
@@ -383,32 +494,40 @@ atanh(Xs) when is_list(Xs) ->
 atanh(X)                   ->
     bmath_libc:atanh(X).
 
--spec erf(_X) -> num() when
-      _X :: num().
+-spec erf(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes error function
 
-erf(X) ->
+erf(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:erf(X) end, Xs);
+erf(X)                   ->
     bmath_libc:erf(X).
 
--spec erfc(_X) -> num() when
-      _X :: num().
+-spec erfc(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes complementary error function
 
+erfc(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:erfc(X) end, Xs);
 erfc(X) ->
     bmath_libc:erfc(X).
 
--spec tgamma(_X) -> num() when
-      _X :: num().
+-spec tgamma(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes gamma function. 
 
-tgamma(X) ->
+tgamma(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:tgamma(X) end, Xs);
+tgamma(X)                   ->
     bmath_libc:tgamma(X).
 
--spec lgamma(X) -> num() when
-      X :: num().
+-spec lgamma(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Computes natural (base-e) logarithm of the gamma function. 
 
-lgamma(X) ->
+lgamma(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:lgamma(X) end, Xs);
+lgamma(X)                   ->
     bmath_libc:lgamma(X).
 
 -spec ceil(X) -> num() | [num()] when
@@ -439,19 +558,23 @@ trunc(Xs) when is_list(Xs) ->
 trunc(X)                   ->
     bmath_libc:trunc(X).
 
--spec round(X) -> num() when
-      X :: num().
+-spec round(X) -> num() | [num()] when
+      X :: num() | [num()].
 %% @doc Rounds to the nearest integer, rounding away from zero in halfway 
 %% cases.
 
-round(X) ->
+round(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:round(X) end, Xs);
+round(X)                   ->
     bmath_libc:round(X).
 
--spec modf(X) -> {num(), num()} when
-      X :: num().
+-spec modf(X) -> {num(), num()} | [{num(), num()}] when
+      X :: num() | [num()].
 %% @doc Breaks a number into integer and fractional parts
 
-modf(X) ->
+modf(Xs) when is_list(Xs) ->
+    lists:map(fun(X) -> bmath_libc:modf(X) end, Xs);
+modf(X)                   ->
     bmath_libc:modf(X).
 
 -spec next_after(From, To) -> num() when
